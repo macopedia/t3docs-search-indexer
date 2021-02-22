@@ -30,8 +30,6 @@ class ElasticRepository
 
     private $totalHits = 0;
 
-    private $elasticaClient;
-
     /**
      * @var Client
      */
