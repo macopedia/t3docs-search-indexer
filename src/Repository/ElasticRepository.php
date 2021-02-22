@@ -15,6 +15,7 @@ use Elastica\Client;
 use Elastica\Document;
 use Elastica\Index;
 use Elastica\Query;
+use Symfony\Component\Config\Definition\Exception\Exception;
 
 class ElasticRepository
 {
@@ -29,6 +30,8 @@ class ElasticRepository
 
     private $totalHits = 0;
 
+    private $elasticaClient;
+
     /**
      * @var Client
      */
@@ -36,13 +39,8 @@ class ElasticRepository
 
     public function __construct()
     {
-        $elasticConfig = [
-            'host' => 'localhost',
-            'port' => '9200',
-            'path' =>  '',
-            'transport' => 'Http',
-            'index' => 'docsearch',
-        ];
+        $elasticConfig = $this->getElasticSearchConfig();
+
         if (!empty($elasticConfig['username']) && !empty($elasticConfig['password'])) {
             $elasticConfig['headers'] = [
                 'Authorization' => 'Basic ' .
@@ -268,5 +266,20 @@ class ElasticRepository
         $escapedString = str_replace('/', '\/', $escapedString);
 
         return $escapedString;
+    }
+
+    private function getElasticSearchConfig(): array
+    {
+        if (empty($_ENV['ELASTICA_HOST']) || empty($_ENV['ELASTICA_PORT']) || empty($_ENV['ELASTICA_TRANSPORT']) || empty($_ENV['ELASTICA_INDEX'])) {
+            throw new Exception('Missing Elasticsearch configuration. Check your .env file');
+        }
+
+        return [
+            'host' => $_ENV['ELASTICA_HOST'],
+            'port' => $_ENV['ELASTICA_PORT'],
+            'path' => $_ENV['ELASTICA_PATH'],
+            'transport' => $_ENV['ELASTICA_TRANSPORT'],
+            'index' => $_ENV['ELASTICA_INDEX'],
+        ];
     }
 }
