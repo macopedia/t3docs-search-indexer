@@ -278,6 +278,8 @@ class ElasticRepository
             'path' => $_ENV['ELASTICA_PATH'],
             'transport' => $_ENV['ELASTICA_TRANSPORT'],
             'index' => $_ENV['ELASTICA_INDEX'],
+            'username' => $_ENV['ELASTICA_USERNAME'],
+            'password' => $_ENV['ELASTICA_PASSWORD'],
         ];
     }
 }
