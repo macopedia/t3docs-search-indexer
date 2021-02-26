@@ -2,8 +2,8 @@
 <div aria-label="breadcrumbs navigation" class="breadcrumb-bar" role="navigation">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="#">Start</a></li>
-        <li aria-current="page" class="breadcrumb-item active">Welcome to the official TYPO3
-            Documentation
+        <li aria-current="page" class="breadcrumb-item active">
+            {% if breadcrumb_title is defined %}{{ breadcrumb_title }}{% endif %}
         </li>
     </ol>
     <div class="breadcrumb-additions">
