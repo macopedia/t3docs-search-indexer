@@ -19,6 +19,16 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 
 class ElasticRepository
 {
+    private const ELASTICA_DEFAULT_CONFIGURATION = [
+        'host' => 'localhost',
+        'port' => '9200',
+        'path' =>  '',
+        'transport' => 'Http',
+        'index' => 'docsearch',
+        'username' => '',
+        'password' => '',
+    ];
+
     /**
      * @var Index
      */
@@ -269,7 +279,7 @@ class ElasticRepository
     private function getElasticSearchConfig(): array
     {
         if (empty($_ENV['ELASTICA_HOST']) || empty($_ENV['ELASTICA_PORT']) || empty($_ENV['ELASTICA_TRANSPORT']) || empty($_ENV['ELASTICA_INDEX'])) {
-            throw new Exception('Missing Elasticsearch configuration. Check your .env file');
+            return self::ELASTICA_DEFAULT_CONFIGURATION;
         }
 
         return [
