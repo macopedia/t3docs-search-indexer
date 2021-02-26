@@ -22,7 +22,7 @@ class ElasticRepository
     private const ELASTICA_DEFAULT_CONFIGURATION = [
         'host' => 'localhost',
         'port' => '9200',
-        'path' =>  '',
+        'path' => '',
         'transport' => 'Http',
         'index' => 'docsearch',
         'username' => '',
@@ -143,7 +143,7 @@ class ElasticRepository
             ],
         ];
         if (array_key_exists('page', $_GET)) {
-            $this->currentPage = (int) $_GET['page'];
+            $this->currentPage = (int)$_GET['page'];
         }
         #$usedFilters = $this->addFilters();
         #if (count($usedFilters) > 0) {
@@ -176,7 +176,7 @@ class ElasticRepository
             'maxScore' => $maxScore,
             'aggs' => $aggs,
         ];
-        if ($this->totalHits <= (int) $out['endingAtItem']) {
+        if ($this->totalHits <= (int)$out['endingAtItem']) {
             $out['endingAtItem'] = $this->totalHits;
         }
         return $out;
@@ -250,7 +250,7 @@ class ElasticRepository
 
         $out = [];
         while ($i < $numPages) {
-            $out[(int) $i] = ($i + 1);
+            $out[(int)$i] = ($i + 1);
             ++$i;
         }
 
@@ -278,18 +278,14 @@ class ElasticRepository
 
     private function getElasticSearchConfig(): array
     {
-        if (empty($_ENV['ELASTICA_HOST']) || empty($_ENV['ELASTICA_PORT']) || empty($_ENV['ELASTICA_TRANSPORT']) || empty($_ENV['ELASTICA_INDEX'])) {
-            return self::ELASTICA_DEFAULT_CONFIGURATION;
-        }
+        $config['host'] = $_ENV['ELASTICA_HOST'] ?? self::ELASTICA_DEFAULT_CONFIGURATION['host'];
+        $config['port'] = $_ENV['ELASTICA_PORT'] ?? self::ELASTICA_DEFAULT_CONFIGURATION['port'];
+        $config['path'] = $_ENV['ELASTICA_PATH'] ?? self::ELASTICA_DEFAULT_CONFIGURATION['path'];
+        $config['transport'] = $_ENV['ELASTICA_TRANSPORT'] ?? self::ELASTICA_DEFAULT_CONFIGURATION['transport'];
+        $config['index'] = $_ENV['ELASTICA_INDEX'] ?? self::ELASTICA_DEFAULT_CONFIGURATION['index'];
+        $config['username'] = $_ENV['ELASTICA_USERNAME'] ?? self::ELASTICA_DEFAULT_CONFIGURATION['username'];
+        $config['password'] = $_ENV['ELASTICA_PASSWORD'] ?? self::ELASTICA_DEFAULT_CONFIGURATION['password'];
 
-        return [
-            'host' => $_ENV['ELASTICA_HOST'],
-            'port' => $_ENV['ELASTICA_PORT'],
-            'path' => $_ENV['ELASTICA_PATH'],
-            'transport' => $_ENV['ELASTICA_TRANSPORT'],
-            'index' => $_ENV['ELASTICA_INDEX'],
-            'username' => $_ENV['ELASTICA_USERNAME'],
-            'password' => $_ENV['ELASTICA_PASSWORD'],
-        ];
+        return $config;
     }
 }
