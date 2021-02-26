@@ -4,14 +4,6 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <meta content="Welcome!" name="docsearch:name"/>
-    <meta content="" name="docsearch:package_type"/>
-    <meta content="master" name="docsearch:release"/>
-    <meta content="2.0" name="docsearch:version"/>
-    <meta content="2020-10-30T07:03:47+00:00" name="docsearch:modified"/>
-    <link href="http://purl.org/dc/elements/1.1/" rel="schema.dc"/>
-    <meta content="2020-10-30T07:03:47+00:00" name="dc.modified"/>
-    <meta content="2020-10-30T07:03:47+00:00" property="article:modified_time"/>
     <title>{% block title %}{% endblock %}</title>
     <link href="https://typo3.azureedge.net/typo3documentation/theme/sphinx_typo3_theme/4.4.3/css/theme.css" rel="stylesheet" type="text/css"/>
     <link href="https://typo3.azureedge.net/typo3documentation/theme/sphinx_typo3_theme/4.4.3/css/webfonts.css" rel="stylesheet" type="text/css"/>
@@ -41,9 +33,7 @@
 
     <div class="page-main">
         <div class="page-main-inner">
-            {% block navigation %}
-                {% include 'partial/page_main/navigation.html.twig' %}
-            {% endblock %}
+            {% block navigation %}{% endblock %}
 
             <div class="page-main-content">
                 <div class="rst-content">
