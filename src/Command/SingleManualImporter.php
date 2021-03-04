@@ -74,19 +74,19 @@ class SingleManualImporter extends Command
     {
         $this->selectIndexFolder($input, $output)
             ->selectSubFolder($input, $output)
-            ->importManuals($input, $output)
-        ;
+            ->importManuals($input, $output);
     }
 
     private function importManuals(InputInterface $input, OutputInterface $output)
     {
+        /** @var Manual $manual */
         $manual = $this->importer->findManual($this->defaultRootPath, $this->pathToManual);
         $timer = new Stopwatch();
         $timer->start('importer');
 
         $this->io = new SymfonyStyle($input, $output);
         $this->io->title('Starting import');
-//        $this->io->writeln('Found ' . count($manuals) . ' manuals.');
+        $this->io->writeln('Import manual ' . $manual->getTitle());
 
         $this->importer->deleteManual($manual);
         $this->importer->importManual($manual);
