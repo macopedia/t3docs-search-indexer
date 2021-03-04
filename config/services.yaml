@@ -10,6 +10,7 @@ parameters:
             excluded_directories:
                 - other
                 - draft
+                - typo3cms/extensions
 
 services:
     # default configuration for services in *this* file
