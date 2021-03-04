@@ -18,7 +18,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 class SingleManualImporter extends Command
 {
     private const INDEX_FOLDERS = ['c', 'm', 'p'];
-
+    private const FOLDER_DEPTH = 4;
     /**
      * @var string $defaultRootPath
      */
@@ -45,6 +45,8 @@ class SingleManualImporter extends Command
 
     private $indexFolder;
 
+    private $incrementor;
+
     /**
      * SingleManualImporter constructor.
      * @param string $defaultRootPath
@@ -57,6 +59,7 @@ class SingleManualImporter extends Command
         $this->appRootDir = $appRootDir;
         $this->importer = $importer;
         $this->finder = new Finder();
+        $this->incrementor = 0;
 
         parent::__construct();
     }
@@ -70,9 +73,6 @@ class SingleManualImporter extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->selectIndexFolder($input, $output)
-            ->selectSubFolder($input, $output)
-            ->selectSubFolder($input, $output)
-            ->selectSubFolder($input, $output)
             ->selectSubFolder($input, $output)
             ->importManuals($input, $output)
         ;
@@ -114,6 +114,7 @@ class SingleManualImporter extends Command
 
     private function selectSubFolder(InputInterface $input, OutputInterface $output): self
     {
+        $this->incrementor++;
         $finder = $this->finder->directories()->in($this->finderPath)->depth('== 0');
         $subcategories = [];
         $subcategoriesListOptions = [];
@@ -139,6 +140,10 @@ class SingleManualImporter extends Command
 
         $this->finderPath .= DIRECTORY_SEPARATOR . $folder;
         $this->pathToManual .= DIRECTORY_SEPARATOR . $folder;
+
+        if ($this->incrementor < self::FOLDER_DEPTH) {
+            $this->selectSubFolder($input, $output);
+        }
 
         return $this;
 
