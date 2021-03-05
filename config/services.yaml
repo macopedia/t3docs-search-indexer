@@ -8,7 +8,7 @@ parameters:
                 - 'draft'
     assets:
         css:
-            - '/assets/css/theme.css'
+            - 'https://typo3.azureedge.net/typo3documentation/theme/sphinx_typo3_theme/4.4.3/css/theme.css'
             - 'https://typo3.azureedge.net/typo3documentation/theme/sphinx_typo3_theme/4.4.3/css/webfonts.css'
             - 'https://typo3.azureedge.net/typo3documentation/theme/sphinx_typo3_theme/4.4.3/css/fontawesome.css'
         js:
