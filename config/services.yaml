@@ -6,6 +6,22 @@ parameters:
             exclude:
                 - 'other'
                 - 'draft'
+    assets:
+        css:
+            - '/assets/css/theme.css'
+            - 'https://typo3.azureedge.net/typo3documentation/theme/sphinx_typo3_theme/4.4.3/css/webfonts.css'
+            - 'https://typo3.azureedge.net/typo3documentation/theme/sphinx_typo3_theme/4.4.3/css/fontawesome.css'
+        js:
+            - 'https://typo3.azureedge.net/typo3documentation/theme/sphinx_typo3_theme/4.4.3/js/modernizr.min.js'
+            - 'https://typo3.azureedge.net/typo3infrastructure/universe/dist/webcomponents-loader.js'
+            - 'https://typo3.azureedge.net/typo3documentation/theme/sphinx_typo3_theme/4.4.3/js/jquery.min.js'
+            - 'https://typo3.azureedge.net/typo3documentation/theme/sphinx_typo3_theme/4.4.3/js/underscore.min.js'
+            - 'https://typo3.azureedge.net/typo3documentation/theme/sphinx_typo3_theme/4.4.3/js/doctools.min.js'
+            - 'https://typo3.azureedge.net/typo3documentation/theme/sphinx_typo3_theme/4.4.3/js/popper.min.js'
+            - 'https://typo3.azureedge.net/typo3documentation/theme/sphinx_typo3_theme/4.4.3/js/bootstrap.min.js'
+            - 'https://typo3.azureedge.net/typo3documentation/theme/sphinx_typo3_theme/4.4.3/js/searchtools.min.js'
+            - 'https://typo3.azureedge.net/typo3documentation/theme/sphinx_typo3_theme/4.4.3/js/autocomplete.min.js'
+            - 'https://typo3.azureedge.net/typo3documentation/theme/sphinx_typo3_theme/4.4.3/js/theme.min.js'
 
 services:
     # default configuration for services in *this* file
