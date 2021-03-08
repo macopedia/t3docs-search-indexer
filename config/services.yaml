@@ -3,9 +3,14 @@
 parameters:
     docsearch:
         indexer:
-            exclude:
-                - 'other'
-                - 'draft'
+            allowed_directories:
+                - m
+                - c
+                - foo
+            excluded_directories:
+                - other
+                - draft
+                - typo3cms/extensions
     assets:
         css:
             - 'https://typo3.azureedge.net/typo3documentation/theme/sphinx_typo3_theme/4.4.3/css/theme.css'
@@ -49,3 +54,8 @@ services:
     App\Command\SnippetImporter:
         arguments:
             $defaultRootPath: '%env(DOCS_ROOT_PATH)%'
+
+    App\Command\SingleManualImporter:
+        arguments:
+            $defaultRootPath: '%env(DOCS_ROOT_PATH)%'
+            $appRootDir: '%kernel.project_dir%'
