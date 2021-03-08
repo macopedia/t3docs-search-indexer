@@ -6,7 +6,8 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>{% block title %}{% endblock %}</title>
 
-    {{ render_assets('css') | raw }}
+    {{ render_assets('css', 'header') | raw }}
+    {{ render_assets('js', 'header') | raw }}
 
     {% block link_tags %}
         {% include 'partial/base/linktags.html.twig' %}
@@ -43,7 +44,7 @@
                         </div>
                     </div>
 
-                    {#TODO: Implement paginator#}
+                    {# TODO: Implement paginator #}
                 </div>
             </div>
         </div>
@@ -54,8 +55,6 @@
     {% endblock %}
 </div>
 
-{{ render_assets('js') | raw }}
-
 <script type="text/javascript">
     let DOCUMENTATION_OPTIONS = {
         URL_ROOT: './',
@@ -65,8 +64,14 @@
         HAS_SOURCE: true
     };
 </script>
-<script type="text/javascript">
-    jQuery(function() { Search.loadIndex("searchindex.js"); });
+
+{{ render_assets('js', 'footer') | raw }}
+
+<script type="text/javascript" id="searchindexpath" data-path="{{ asset('assets/js/searchindex.js') }}">
+    jQuery(function () {
+        let searchindexpath = $('#searchindexpath').data('path');
+        Search.loadIndex(searchindexpath);
+    });
 </script>
 <script id="searchindexloader" type="text/javascript"></script>
 </body>

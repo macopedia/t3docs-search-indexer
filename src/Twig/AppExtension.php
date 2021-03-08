@@ -31,12 +31,9 @@ class AppExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * @param string $assetType
-     */
-    public function renderAssets(string $assetType)
+    public function renderAssets(string $assetType, string $assetLocation = 'header'): string
     {
-        $assets = $this->getAssetByType($assetType);
+        $assets = $this->getAssetByTypeAndLocation($assetType, $assetLocation);
 
         return $this->twigEnvironment->render('extension/assets.html.twig', [
             'assets' => $assets,
@@ -44,10 +41,9 @@ class AppExtension extends AbstractExtension
         ]);
     }
 
-    public function renderSingleAsset(string $assetUrl, string $assetType)
+    public function renderSingleAsset(string $assetUrl, string $assetType): string
     {
         $isUrlExternal = filter_var($assetUrl, FILTER_VALIDATE_URL);
-
         $isLocalAsset = $isUrlExternal ? true : false;
 
         return $this->twigEnvironment->render('extension/single_assert.html.twig', [
@@ -57,11 +53,11 @@ class AppExtension extends AbstractExtension
         ]);
     }
 
-    private function getAssetByType(string $assetType): array
+    private function getAssetByTypeAndLocation(string $assetType, string $assetLocation): array
     {
         $assetsConfig = $this->parameterBag->get('assets');
 
-        return $assetsConfig[$assetType];
+        return isset($assetsConfig[$assetType][$assetLocation]) ? $assetsConfig[$assetType][$assetLocation] : [];
     }
 
 }
