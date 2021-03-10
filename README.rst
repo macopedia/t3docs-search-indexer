@@ -35,6 +35,16 @@ and ``$assetLocation`` is ``header`` or ``footer``
 
 Usage
 -----
+Common instructions for docsearch indexer
+^^^^^^^^^^
+
+* Docsearch indexer configuration is keep in the `services.yml` file in `docsearch` section.
+
+* You can configure 2 kinds of directories:
+
+    * allowed_directories - directories which should be indexed by Indexer
+
+    * excluded_directories - directories which should be ignored by Indexer
 
 Index docs
 ^^^^^^^^^^
@@ -47,5 +57,19 @@ Index docs
 * Open ``http://localhost:9200/docsearch_english_a/_search?q=*:*`` to see indexed
   documentations.
 
-*  php -S 127.0.0.1:8081 -t ./public
+* php -S 127.0.0.1:8081 -t ./public
+
+Index single manual
+^^^^^^^^^^
+
+* Start elasticsearch.
+
+* Run ``./bin/console docsearch:import:single-manual`` and, following the instructions on screen, select
+manual which should be indexed (selected from the docsearch configuration)
+
+* Open ``http://localhost:9200/docsearch_english_a/_search?q=*:*`` to see indexed
+  documentations.
+
+* php -S 127.0.0.1:8081 -t ./public
+
 
