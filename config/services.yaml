@@ -7,7 +7,7 @@ parameters:
             allowed_directories:
                 - m
                 - c
-                - foo
+                - p
             excluded_directories:
                 - other
                 - draft

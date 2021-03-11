@@ -141,17 +141,22 @@ class SnippetImporter extends Command
 
     public function startProgress(ManualStart $event)
     {
-        $this->io->progressStart($event->getFiles()->count());
-        $event->stopPropagation();
+        if ($this->io) {
+            $this->io->progressStart($event->getFiles()->count());
+        }
     }
 
     public function advanceProgress(Event $event)
     {
-        $this->io->progressAdvance();
+        if ($this->io) {
+            $this->io->progressAdvance();
+        }
     }
 
     public function finishProgress(Event $event)
     {
-        $this->io->progressFinish();
+        if ($this->io) {
+            $this->io->progressFinish();
+        }
     }
 }

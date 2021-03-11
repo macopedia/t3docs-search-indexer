@@ -4,6 +4,8 @@
 namespace App\Command;
 
 use App\Dto\Manual;
+use App\Event\ImportManual\ManualAdvance;
+use App\Event\ImportManual\ManualFinish;
 use App\Event\ImportManual\ManualStart;
 use App\Service\DirectoryFinderService;
 use App\Service\ImportManualHTMLService;
@@ -85,14 +87,30 @@ class SingleManualImporter extends Command
         $this->incrementor = 0;
         $this->directoryFinder = $directoryFinder;
         $dispatcher->addListener(ManualStart::NAME, [$this, 'startProgress']);
-
+        $dispatcher->addListener(ManualAdvance::NAME, [$this, 'advanceProgress']);
+        $dispatcher->addListener(ManualFinish::NAME, [$this, 'finishProgress']);
         parent::__construct();
     }
 
     public function startProgress(ManualStart $event)
     {
-        $this->io->progressStart($event->getFiles()->count());
-        $event->stopPropagation();
+        if ($this->io) {
+            $this->io->progressStart($event->getFiles()->count());
+        }
+    }
+
+    public function advanceProgress(Event $event)
+    {
+        if ($this->io) {
+            $this->io->progressAdvance();
+        }
+    }
+
+    public function finishProgress(Event $event)
+    {
+        if ($this->io) {
+            $this->io->progressFinish();
+        }
     }
 
     protected function configure()
