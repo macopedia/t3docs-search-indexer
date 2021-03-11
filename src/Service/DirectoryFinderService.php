@@ -31,6 +31,25 @@ class DirectoryFinderService
     }
 
     /**
+     * @param string $manualPath
+     * @param string|null $depth
+     * @return Finder
+     */
+    public function findSubDirectories(string $manualPath, string $depth = null): Finder
+    {
+        $projectDir = $this->kernel->getProjectDir();
+        $docsRootPath = $this->kernel->getContainer()->getParameter('docs_root_path');
+        $searchDir = $projectDir . DIRECTORY_SEPARATOR . $docsRootPath . DIRECTORY_SEPARATOR . $manualPath;
+        $subdirectories = $this->finder->directories()->in($searchDir);
+
+        if ($depth) {
+            $subdirectories->depth($depth);
+        }
+
+        return $subdirectories;
+    }
+
+    /**
      * @return Finder
      */
     public function getFinder(): Finder

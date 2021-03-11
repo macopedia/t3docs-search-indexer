@@ -4,21 +4,28 @@
 namespace App\Command;
 
 use App\Dto\Manual;
+use App\Event\ImportManual\ManualStart;
+use App\Service\DirectoryFinderService;
 use App\Service\ImportManualHTMLService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Stopwatch\Stopwatch;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class SingleManualImporter extends Command
 {
     private const FOLDER_DEPTH = 4;
+    private const MIN_MANUAL_PATH_FOLDERS_COUNT = 3;
+    private const MAX_MANUAL_PATH_FOLDERS_COUNT = 5;
     /**
      * @var string $defaultRootPath
      */
@@ -49,14 +56,26 @@ class SingleManualImporter extends Command
 
     private $parameterBag;
 
+    private $directoryFinder;
+    /** @var SymfonyStyle */
+    private $io;
+
     /**
      * SingleManualImporter constructor.
      * @param string $defaultRootPath
      * @param string $appRootDir
      * @param ImportManualHTMLService $importer
      * @param ParameterBagInterface $parameterBag
+     * @param DirectoryFinderService $directoryFinder
      */
-    public function __construct(string $defaultRootPath, string $appRootDir, ImportManualHTMLService $importer, ParameterBagInterface $parameterBag)
+    public function __construct(
+        string $defaultRootPath,
+        string $appRootDir,
+        ImportManualHTMLService $importer,
+        ParameterBagInterface $parameterBag,
+        DirectoryFinderService $directoryFinder,
+        EventDispatcherInterface $dispatcher
+    )
     {
         $this->defaultRootPath = $defaultRootPath;
         $this->appRootDir = $appRootDir;
@@ -64,21 +83,37 @@ class SingleManualImporter extends Command
         $this->parameterBag = $parameterBag;
         $this->finder = new Finder();
         $this->incrementor = 0;
+        $this->directoryFinder = $directoryFinder;
+        $dispatcher->addListener(ManualStart::NAME, [$this, 'startProgress']);
 
         parent::__construct();
+    }
+
+    public function startProgress(ManualStart $event)
+    {
+        $this->io->progressStart($event->getFiles()->count());
+        $event->stopPropagation();
     }
 
     protected function configure()
     {
         $this->setName('docsearch:import:single-manual');
         $this->setDescription('Imports single manual');
+        $this->addArgument('manualPath', InputArgument::OPTIONAL, 'Path to a single manual');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if ($input->getArgument('manualPath')) {
+            $this->indexManualPath($input, $output);
+            return 0;
+        }
+
         $this->selectIndexFolder($input, $output)
             ->selectSubFolder($input, $output)
             ->importManuals($input, $output);
+
+        return 0;
     }
 
     private function importManuals(InputInterface $input, OutputInterface $output)
@@ -87,7 +122,6 @@ class SingleManualImporter extends Command
         $manual = $this->importer->findManual($this->defaultRootPath, $this->pathToManual);
         $timer = new Stopwatch();
         $timer->start('importer');
-
         $this->io = new SymfonyStyle($input, $output);
         $this->io->title('Starting import');
         $this->io->writeln('Import manual ' . $manual->getTitle());
@@ -179,4 +213,39 @@ class SingleManualImporter extends Command
         return $docsearchConfig['indexer'];
     }
 
+    private function indexManualPath(InputInterface $input, OutputInterface $output): int
+    {
+        $manualPath = $input->getArgument('manualPath');
+        $manualPathArray = explode('/', $manualPath);
+        $docsearchConfig = $this->getIndexDirectories();
+        $allowedDirectories = $docsearchConfig['allowed_directories'];
+
+        if (empty(array_intersect($manualPathArray, $allowedDirectories))) {
+            $errorMessagePattern = '<error>Given path %s is excluded by configuration, please check services.yaml file</error>';
+            $output->writeln(sprintf($errorMessagePattern, $this->pathToManual));
+        }
+
+        switch (count($manualPathArray)) {
+            case count($manualPathArray) === self::MIN_MANUAL_PATH_FOLDERS_COUNT:
+                $subfolders = $this->directoryFinder->findSubDirectories($manualPath, '== 1');
+
+                foreach ($subfolders->getIterator() as $subfolder) {
+                    $this->pathToManual = $manualPath . DIRECTORY_SEPARATOR . $subfolder->getRelativePathname();
+                    $this->importManuals($input, $output);
+                }
+                return 0;
+            case count($manualPathArray) > self::MIN_MANUAL_PATH_FOLDERS_COUNT && count($manualPathArray) < self::MAX_MANUAL_PATH_FOLDERS_COUNT:
+                $subfolders = $this->directoryFinder->findSubDirectories($manualPath, '<= 0');
+
+                foreach ($subfolders->getIterator() as $subfolder) {
+                    $this->pathToManual = $manualPath . DIRECTORY_SEPARATOR . $subfolder->getRelativePathname();
+                    $this->importManuals($input, $output);
+                }
+                return 0;
+            case count($manualPathArray) === self::MAX_MANUAL_PATH_FOLDERS_COUNT:
+                $this->importManuals($input, $output);
+
+                return 0;
+        }
+    }
 }

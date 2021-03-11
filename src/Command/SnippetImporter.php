@@ -38,6 +38,7 @@ class SnippetImporter extends Command
     private $finder;
 
     private $directoryFinder;
+    private $io;
 
     public function __construct(
         string $defaultRootPath,
@@ -138,9 +139,10 @@ class SnippetImporter extends Command
         return sprintf('%02d:%02d:%02d', ($t / 3600), ($t / 60 % 60), $t % 60);
     }
 
-    public function startProgress(Event $event)
+    public function startProgress(ManualStart $event)
     {
         $this->io->progressStart($event->getFiles()->count());
+        $event->stopPropagation();
     }
 
     public function advanceProgress(Event $event)
