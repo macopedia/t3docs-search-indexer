@@ -7,6 +7,7 @@
         "ext-iconv": "*",
         "ruflin/elastica": "5.*",
         "sensio/framework-extra-bundle": "^5.5",
+        "symfony/asset": "^4.3",
         "symfony/console": "^4.3",
         "symfony/css-selector": "^4.3",
         "symfony/dom-crawler": "^4.3",
@@ -20,7 +21,8 @@
     "require-dev": {
         "mikey179/vfsstream": "^1.6",
         "symfony/dotenv": "^4.3",
-        "symfony/phpunit-bridge": "^4.3"
+        "symfony/phpunit-bridge": "^4.3",
+        "friendsofphp/php-cs-fixer": ">=v2.18.2"
     },
     "config": {
         "preferred-install": {
