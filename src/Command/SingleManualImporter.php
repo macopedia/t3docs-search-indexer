@@ -43,11 +43,6 @@ class SingleManualImporter extends Command
      */
     private $importer;
 
-    /**
-     * @var Finder $finder
-     */
-    private $finder;
-
     private $finderPath;
 
     private $pathToManual;
@@ -69,6 +64,7 @@ class SingleManualImporter extends Command
      * @param ImportManualHTMLService $importer
      * @param ParameterBagInterface $parameterBag
      * @param DirectoryFinderService $directoryFinder
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
         string $defaultRootPath,
@@ -83,7 +79,6 @@ class SingleManualImporter extends Command
         $this->appRootDir = $appRootDir;
         $this->importer = $importer;
         $this->parameterBag = $parameterBag;
-        $this->finder = new Finder();
         $this->incrementor = 0;
         $this->directoryFinder = $directoryFinder;
         $dispatcher->addListener(ManualStart::NAME, [$this, 'startProgress']);
@@ -92,21 +87,21 @@ class SingleManualImporter extends Command
         parent::__construct();
     }
 
-    public function startProgress(ManualStart $event)
+    public function startProgress(ManualStart $event): void
     {
         if ($this->io) {
             $this->io->progressStart($event->getFiles()->count());
         }
     }
 
-    public function advanceProgress(Event $event)
+    public function advanceProgress(Event $event): void
     {
         if ($this->io) {
             $this->io->progressAdvance();
         }
     }
 
-    public function finishProgress(Event $event)
+    public function finishProgress(Event $event): void
     {
         if ($this->io) {
             $this->io->progressFinish();
@@ -170,14 +165,15 @@ class SingleManualImporter extends Command
 
     private function selectSubFolder(InputInterface $input, OutputInterface $output): self
     {
+        $finder = new Finder();
         $this->incrementor++;
-        $finder = $this->finder->directories()->in($this->finderPath)->depth('== 0');
+        $results = $finder->directories()->in($this->finderPath)->depth('== 0');
         $subcategories = [];
         $subcategoriesListOptions = [];
         $i = 0;
 
         /** @var SplFileInfo $folder */
-        foreach ($finder->getIterator() as $folder) {
+        foreach ($results->getIterator() as $folder) {
             $subcategories[$i]['dirname'] = $folder->getBasename();
             $subcategories[$i]['realPath'] = $folder->getRealPath();
             $i++;
