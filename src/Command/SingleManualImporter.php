@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Command;
 
 use App\Dto\Manual;
@@ -104,7 +103,8 @@ class SingleManualImporter extends Command
         $finderPathFormat = $this->defaultRootPath . '/%s';
         $indexFolders = $this->getIndexDirectories();
         $question = new ChoiceQuestion(
-            'Select folder', $indexFolders['allowed_directories']
+            'Select folder',
+            $indexFolders['allowed_directories']
         );
         $question->setErrorMessage('Can not index folder \'%s\'');
         $folder = $this->getQuestionHelper()->ask($input, $output, $question);
@@ -136,7 +136,8 @@ class SingleManualImporter extends Command
         }
 
         $question = new ChoiceQuestion(
-            'Select folder', $subcategoriesListOptions
+            'Select folder',
+            $subcategoriesListOptions
         );
 
         $question->setErrorMessage('Can not find folder \'%s\'');
@@ -150,7 +151,6 @@ class SingleManualImporter extends Command
         }
 
         return $this;
-
     }
 
     /**
@@ -178,5 +178,4 @@ class SingleManualImporter extends Command
 
         return $docsearchConfig['indexer'];
     }
-
 }

@@ -16,7 +16,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -112,16 +111,16 @@ class SnippetImporter extends Command
         $directoryFinder = $this->directoryFinder->findAllowedDirectoriesForDocSearch($rootPath);
         $manuals = [];
 
-        if (empty($directoryFinder['manualsPath'])) {
-            $output->writeln($directoryFinder['message']);
+        if (empty($directoryFinder->getManualLinks())) {
+            $output->writeln($directoryFinder->getMessage());
 
-            return 0;
+            exit;
         }
 
-        $output->writeln($directoryFinder['message']);
+        $output->writeln($directoryFinder->getMessage());
 
-        foreach ($directoryFinder['manualsPath'] as $manualPath) {
-            $manuals = array_merge($manuals, $this->importer->findManuals($manualPath));
+        foreach ($directoryFinder->getManualLinks() as $manualLink) {
+            $manuals = array_merge($manuals, $this->importer->findManuals($manualLink));
         }
 
         return $manuals;

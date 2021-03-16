@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Service;
-
 
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -14,18 +12,20 @@ class DirectoryFinderService
     private $finder;
     /** @var KernelInterface */
     private $kernel;
+    /** @var ConsoleOutputMessageService */
+    private $consoleOutputMessage;
 
-    public function __construct(KernelInterface $kernel)
+    public function __construct(KernelInterface $kernel, ConsoleOutputMessageService $consoleOutputMessage)
     {
         $this->finder = new Finder();
         $this->kernel = $kernel;
+        $this->consoleOutputMessage = $consoleOutputMessage;
     }
 
     /**
      * @param string $rootPath
-     * @return array
      */
-    public function findAllowedDirectoriesForDocSearch(string $rootPath): array
+    public function findAllowedDirectoriesForDocSearch(string $rootPath): ConsoleMessagePayload
     {
         return $this->getAllowedDirectories($rootPath);
     }
@@ -48,9 +48,9 @@ class DirectoryFinderService
 
     /**
      * @param $rootPath
-     * @return array
+     * @return ConsoleMessagePayload
      */
-    private function getAllowedDirectories($rootPath): array
+    private function getAllowedDirectories(string $rootPath): ConsoleMessagePayload
     {
         $projectDir = $this->kernel->getProjectDir();
         $docSearchParameters = $this->kernel->getContainer()->getParameter('docsearch');
@@ -60,11 +60,20 @@ class DirectoryFinderService
         $manualsPathCollection = [];
         $response['message'] = '';
         $response['manualsPath'] = [];
+        $targetPath = $projectDir . DIRECTORY_SEPARATOR . $rootPath;
+
+        if (!is_dir($targetPath)) {
+            return $this->consoleOutputMessage
+                ->setPath($targetPath)
+                ->createMessageResponse(
+                    ConsoleOutputMessageService::INVALID_ROOT_PATH_TYPE,
+                );
+        }
 
         $folders = $this->finder
             ->directories()
             ->name($allowedDirectories)
-            ->in($projectDir . DIRECTORY_SEPARATOR . $rootPath)
+            ->in($targetPath)
         ;
 
         /** @var SplFileInfo $folder */
@@ -75,31 +84,24 @@ class DirectoryFinderService
         $missingDirectories = array_diff($allowedDirectories, $foundDirectories);
 
         if (count($missingDirectories) === count($allowedDirectories)) {
-            $messagePattern = '<error>Directories %s was not found in root directory %s. Please, check configuration</error>';
-            $message = sprintf($messagePattern, implode(', ', $missingDirectories), $rootPath);
-
-            return $this->createResponse($message, $manualsPathCollection);
+            return $this->consoleOutputMessage
+                ->setPath($rootPath)
+                ->setMissingDirectories($missingDirectories)
+                ->createMessageResponse(ConsoleOutputMessageService::DIRECTORIES_NOT_FOUND_TYPE);
         }
 
         if (count($missingDirectories) < count($allowedDirectories)) {
-            $messagePattern = '<info>Directories %s was not found in root directory %s.</info>';
-            $message = sprintf($messagePattern, implode(', ', $missingDirectories), $rootPath);
-
-            foreach ($foundDirectories as $foundDirectory) {
-                $manualsPathCollection[] = $rootPath . DIRECTORY_SEPARATOR . $foundDirectory;
-            }
-
-            return $this->createResponse($message, $manualsPathCollection);
+            return $this->consoleOutputMessage
+                ->setPath($rootPath)
+                ->setMissingDirectories($missingDirectories)
+                ->setFoundDirectories($foundDirectories)
+                ->createMessageResponse(ConsoleOutputMessageService::SOME_DIRECTORIES_MISSING_TYPE);
         }
 
-        $messagePattern = '<info>All directories %s was not found in root directory %s.</info>';
-        $message = sprintf($messagePattern, implode(', ', $foundDirectories), $rootPath);
-
-        foreach ($foundDirectories as $foundDirectory) {
-            $manualsPathCollection[] = $rootPath . DIRECTORY_SEPARATOR . $foundDirectory;
-        }
-
-        return $this->createResponse($message, $manualsPathCollection);
+        return $this->consoleOutputMessage
+            ->setPath($rootPath)
+            ->setFoundDirectories($foundDirectories)
+            ->createMessageResponse(ConsoleOutputMessageService::ALL_DIRECTORIES_FOUND_TYPE);
     }
 
     /**

@@ -1,13 +1,10 @@
 <?php
 
-
 namespace App\Twig;
-
 
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
-use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 class AppExtension extends AbstractExtension
@@ -59,5 +56,4 @@ class AppExtension extends AbstractExtension
 
         return isset($assetsConfig[$assetType][$assetLocation]) ? $assetsConfig[$assetType][$assetLocation] : [];
     }
-
 }
