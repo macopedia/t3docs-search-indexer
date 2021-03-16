@@ -29,7 +29,7 @@ class ParseDocumentationHTMLService
     {
         $docSearchParameters = $this->kernel->getContainer()->getParameter('docsearch');
         $finder = new Finder();
-        $finder->directories()->in($rootPath)->depth('== 4')->exclude($docSearchParameters['indexer']['exclude']);
+        $finder->directories()->in($rootPath)->depth('== 4')->exclude($docSearchParameters['indexer']['excluded_directories']);
 
         return $finder;
     }
@@ -37,7 +37,7 @@ class ParseDocumentationHTMLService
     public function createFromFolder(string $prefixFolder, SplFileInfo $folder): Manual
     {
         $prefixFolder = rtrim($prefixFolder, '/') . '/';
-        $folderPath = (string) $folder;
+        $folderPath = (string)$folder;
 
         $relativeFolderPath = str_replace($prefixFolder, '', $folderPath);
         list($type, $vendor, $name, $version, $language) = explode('/', $relativeFolderPath);
